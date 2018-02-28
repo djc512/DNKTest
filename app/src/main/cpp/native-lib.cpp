@@ -339,3 +339,55 @@ Java_com_example_admin_dnktest_MainActivity_setData(JNIEnv *env, jobject instanc
     env->SetObjectField(bean, familyID, jobjFamily);
 
 }
+extern "C"
+JNIEXPORT jintArray JNICALL
+Java_com_example_admin_dnktest_MainActivity_addTen(JNIEnv *env, jobject instance, jintArray arr_) {
+
+    //创建一个整形数组
+//    jint len = env->GetArrayLength(arr_);
+//
+//    jintArray intArr = env->NewIntArray(len);
+//    jint *arr = env->GetIntArrayElements(arr_, NULL);
+//
+//    jint buf[len];
+//
+//    jint i;
+//    for (i = 0; i < len; i++) {
+//        buf[i] = arr[i] + 10;
+//        __android_log_print(ANDROID_LOG_INFO, "DJC", "buf =%d", buf[i]);
+//    }
+//
+//    env->ReleaseIntArrayElements(arr_, arr, 0);
+//    env->SetIntArrayRegion(intArr, 0, len, buf);//给jni创建的新数组赋值，arr_的值不变，但是要返回
+//    return intArr;
+
+//    env->SetIntArrayRegion(arr_, 0, len, buf);直接修改arr_的值
+//    return NULL;
+
+
+    jint len = env->GetArrayLength(arr_);
+    jint *intArr = env->GetIntArrayElements(arr_, JNI_FALSE);
+    jint i;
+    for (int i = 0; i < len; ++i) {
+//        *(intArr + i) += 10;
+        intArr[i] += 10;
+    }
+    env->ReleaseIntArrayElements(arr_, intArr, 0);
+    return arr_;
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_example_admin_dnktest_MainActivity_getInt(JNIEnv *env, jobject instance, jstring value_) {
+    const char *value = env->GetStringUTFChars(value_, 0);
+
+    char *charValue = "123456";
+
+    jint code = strcasecmp(value, charValue);
+
+    env->ReleaseStringUTFChars(value_, value);
+    if (code == 0) {
+        return 200;
+    } else {
+        return 404;
+    }
+}

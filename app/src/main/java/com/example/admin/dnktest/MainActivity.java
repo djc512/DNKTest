@@ -48,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
 
         long destory = destory();
         Log.i("DJC", "释放内存的结果为：" + destory);
+
+        //创建数组
+        int[] origin = {1, 2, 3, 4, 5};
+        int[] dst = addTen(origin);
+        Log.i("DJC", "加10之后：" + Arrays.toString(origin));
+
+        Log.i("DJC","jni层经过判断返回的数值："+getInt("12345"));
     }
 
     public native String stringFromJNI();
@@ -112,4 +119,10 @@ public class MainActivity extends AppCompatActivity {
 
     //对象销毁，释放内存
     public native long destory();
+
+    //数组的元素都+10
+    public native int[] addTen(int[] arr);
+
+    //判断输入的数值，正确返回200，错误404
+    public native int getInt(String value);
 }
