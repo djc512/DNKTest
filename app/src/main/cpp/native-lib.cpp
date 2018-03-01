@@ -2,7 +2,16 @@
 #include <string>
 #include <string.h>
 #include <stdlib.h>
+
 #include <android/log.h>
+
+#define TAG "DJC_JNI" // 这个是自定义的LOG的标识
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__) // 定义LOGI类型
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__) // 定义LOGD类型
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__) // 定义LOGW类型
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__) // 定义LOGE类型
+#define LOGF(...) __android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__) // 定义LOGF类型
+
 
 char *jstringToChar(JNIEnv *env, jstring jstr) {
     char *rtn = NULL;
@@ -390,4 +399,38 @@ Java_com_example_admin_dnktest_MainActivity_getInt(JNIEnv *env, jobject instance
     } else {
         return 404;
     }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_admin_dnktest_JniMethod_callAddSum(JNIEnv *env, jobject instance) {
+
+    //通过反射查找类
+    jclass cls = env->FindClass("com/example/admin/dnktest/JniMethod");
+    //查找调用方法的ID
+    jmethodID methodID = env->GetMethodID(cls, "addSum", "(II)I");
+    //实例化类的对象
+    jobject jobj = env->AllocObject(cls);
+    if (jobj == NULL) {
+        __android_log_print(ANDROID_LOG_INFO, "DJC", "Out Of Memery");
+        return;
+    }
+    //调用java方法
+    jint value = env->CallIntMethod(jobj, methodID, 3, 4);
+    LOGI("value = %d", value);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_admin_dnktest_JniMethod_getShowToast(JNIEnv *env, jobject instance,
+                                                      jobject activity) {
+    //通过对象查找类
+    jclass cls = env->GetObjectClass(activity);
+    //查找方法ID
+    jmethodID jmethodID = env->GetMethodID(cls, "showToast", "()V");
+    if (jmethodID == NULL) {
+        LOGI("jmethodID = %s", jmethodID);
+        return;
+    }
+    LOGI("jni层调用getShowToast");
+    //调用方法
+    env->CallVoidMethod(activity, jmethodID);
 }

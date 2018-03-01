@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -54,7 +55,11 @@ public class MainActivity extends AppCompatActivity {
         int[] dst = addTen(origin);
         Log.i("DJC", "加10之后：" + Arrays.toString(origin));
 
-        Log.i("DJC","jni层经过判断返回的数值："+getInt("12345"));
+        Log.i("DJC", "jni层经过判断返回的数值：" + getInt("12345"));
+
+        JniMethod method = new JniMethod();
+        method.callAddSum();
+        method.getShowToast(this);
     }
 
     public native String stringFromJNI();
@@ -125,4 +130,10 @@ public class MainActivity extends AppCompatActivity {
 
     //判断输入的数值，正确返回200，错误404
     public native int getInt(String value);
+
+    //JNI调用此方法，显示Toast
+    public void showToast() {
+        Log.i("DJC", "调用方法showToast");
+        Toast.makeText(this, "showToast", Toast.LENGTH_SHORT).show();
+    }
 }
