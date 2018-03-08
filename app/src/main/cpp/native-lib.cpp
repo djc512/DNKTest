@@ -12,7 +12,6 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__) // 定义LOGE类型
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__) // 定义LOGF类型
 
-
 char *jstringToChar(JNIEnv *env, jstring jstr) {
     char *rtn = NULL;
     jclass clsstring = env->FindClass("java/lang/String");
@@ -433,4 +432,41 @@ Java_com_example_admin_dnktest_JniMethod_getShowToast(JNIEnv *env, jobject insta
     LOGI("jni层调用getShowToast");
     //调用方法
     env->CallVoidMethod(activity, jmethodID);
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_example_admin_dnktest_MainActivity_appendStr(JNIEnv *env, jobject instance) {
+    //通过对象获取类
+    jclass _cls = env->GetObjectClass(instance);
+    //获取属性ID
+    jfieldID _id = env->GetFieldID(_cls, "str", "Ljava/lang/String;");
+    //获取属性值
+    jstring _str = (jstring) env->GetObjectField(instance, _id);
+    //转换成char
+    const char *dststr = env->GetStringUTFChars(_str, NULL);
+    //创建一个char
+    char oriStr[20] = "Success";//或者 char *oriStr = "success";
+    //拼接字符串
+    strcat((char *) dststr, oriStr);
+    LOGI("dststr = %s", dststr);
+    return env->NewStringUTF(dststr);
+}
+//定义一个比较的方法
+int compare(const void *a, const void *b) {
+    //*(int*)__lhs强制转成一个整形的指针，并且获取这个整形指针的数值
+    return (*(int *) a - *(int *) b);
+};
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_admin_dnktest_MainActivity_sortArr(JNIEnv *env, jobject instance, jintArray arr_) {
+    jint *arr = env->GetIntArrayElements(arr_, NULL);
+    //获取数组的长度
+    jint len = env->GetArrayLength(arr_);
+    //调用函数进行排序
+    /**
+     * __base   arr
+     * sizeof(int)  获取整形的内存地址
+     */
+    qsort(arr, len, sizeof(int), compare);
+    env->ReleaseIntArrayElements(arr_, arr, 0);
 }
