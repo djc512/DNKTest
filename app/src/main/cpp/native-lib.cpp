@@ -451,6 +451,7 @@ Java_com_example_admin_dnktest_MainActivity_appendStr(JNIEnv *env, jobject insta
     LOGI("dststr = %s", dststr);
     return env->NewStringUTF(dststr);
 }
+
 //定义一个比较的方法
 int compare(const void *a, const void *b) {
     //*(int*)__lhs强制转成一个整形的指针，并且获取这个整形指针的数值
@@ -469,4 +470,30 @@ Java_com_example_admin_dnktest_MainActivity_sortArr(JNIEnv *env, jobject instanc
      */
     qsort(arr, len, sizeof(int), compare);
     env->ReleaseIntArrayElements(arr_, arr, 0);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_admin_dnktest_MainActivity_getException(JNIEnv *env, jobject instance) {
+
+    jstring _str;
+
+    jclass _class = env->GetObjectClass(instance);
+    //获取一个java中没有声明的属性的ID
+    jfieldID _jfieldID = env->GetFieldID(_class, "str1", "Ljava/lang/String;");
+    //获取属性值
+    //判断是否发生异常
+    jthrowable _jthrowable = env->ExceptionOccurred();
+    if (_jthrowable != NULL) {//捕捉到异常
+        //清除异常
+        env->ExceptionClear();
+        _jfieldID = env->GetFieldID(_class, "str", "Ljava/lang/String;");
+    }
+    _str = (jstring) env->GetObjectField(instance, _jfieldID);
+    char *str = (char *) env->GetStringUTFChars(_str, NULL);
+    if (strcmp(str, "WWW") != 0) {
+        //假设异常为非法参数异常
+        jclass _cls = env->FindClass("java/lang/IllegalArgumentException");
+        env->ThrowNew(_cls, "非法参数异常");
+    }
+    env->ReleaseStringChars(_str, (const jchar *) str);
 }

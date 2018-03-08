@@ -14,9 +14,9 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    public String str;
+    public String str = "test";
     public int value;
-
+    int[] source = {1, 5, 0, 48, 3, 56, 9, 7};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +60,20 @@ public class MainActivity extends AppCompatActivity {
         JniMethod method = new JniMethod();
         method.callAddSum();
         method.getShowToast(this);
+        appendStr();
+
+        sortArr(source);
+        for (int i = 0; i < source.length; i++) {
+            Log.i("DJC", "i = " + source[i]);
+        }
+
+        //java不能捕获jni中出现的异常，jni可以捕获java中出现的异常
+        try{
+            getException();
+        }catch (Exception e){
+//            IllegalArgumentException
+            Log.i("DJC","捕获的jni异常为："+e.getMessage());
+        }
     }
 
     public native String stringFromJNI();
@@ -136,4 +150,11 @@ public class MainActivity extends AppCompatActivity {
         Log.i("DJC", "调用方法showToast");
         Toast.makeText(this, "showToast", Toast.LENGTH_SHORT).show();
     }
+
+    //拼接字符串
+    public native String appendStr();
+    //数组排序
+    public native void sortArr(int arr[]);
+    //捕获异常
+    public native void getException();
 }
