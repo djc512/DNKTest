@@ -476,7 +476,6 @@ JNIEXPORT void JNICALL
 Java_com_example_admin_dnktest_MainActivity_getException(JNIEnv *env, jobject instance) {
 
     jstring _str;
-
     jclass _class = env->GetObjectClass(instance);
     //获取一个java中没有声明的属性的ID
     jfieldID _jfieldID = env->GetFieldID(_class, "str1", "Ljava/lang/String;");
@@ -496,4 +495,26 @@ Java_com_example_admin_dnktest_MainActivity_getException(JNIEnv *env, jobject in
         env->ThrowNew(_cls, "非法参数异常");
     }
     env->ReleaseStringChars(_str, (const jchar *) str);
+
+    //javac层不能直接捕获c语言的异常，c语言可以捕获java的异常
+    //在java层中输出c语言捕获的异常，先判断是否发生异常，判断jthrowable的值
+    //如果发生异常，先清除异常，再获取正确的正确的值
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_admin_dnktest_MainActivity_cache(JNIEnv *env, jobject instance) {
+    //如果在java层的for循环中调用
+    //非空判断并没有什么用，Log日志还会继续打印，对象还会一直创建
+    //如果想实现缓存策略，只需要将变量声明为静态，即 static jfieldID _jfieldID;
+
+    jclass _cls = env->GetObjectClass(instance);
+    jfieldID _jfieldID;
+    if (_jfieldID == NULL) {
+        _jfieldID = env->GetFieldID(_cls, "str", "Ljava/lang/String;");
+        LOGI("---------------------");
+    }
+
+    //实现缓存策略
+    //1.将属性声明为静态
+    //2.在类库加载的时候，声明一个初始化，在初始化中进行属性的声明，可以实现缓存策略
 }
